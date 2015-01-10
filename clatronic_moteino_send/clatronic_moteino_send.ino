@@ -4,6 +4,14 @@
 #include <RFM69.h>
 #include <SPI.h>
 #include <SPIFlash.h>
+#include "DHT.h"
+
+#define DHTPIN 9     // what pin we're connected to
+
+// Uncomment whatever type you're using!
+#define DHTTYPE DHT11   // DHT 11 
+//#define DHTTYPE DHT22   // DHT 22  (AM2302)
+//#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 
 #define DEBUG 0
@@ -16,7 +24,7 @@
 #define NETWORKID   100
 #define GATEWAYID   1
 #define FREQUENCY   RF69_915MHZ //Match this with the version of your Moteino! (others: RF69_433MHZ, RF69_868MHZ)
-#define KEY         "thisIsEncryptKey" //has to be same 16 characters/bytes on all nodes, not more not less!
+#define KEY         "BienenBoxWaage00" //has to be same 16 characters/bytes on all nodes, not more not less!
 
 #define SERIAL_BAUD 115200
 #define ACK_TIME    30  // # of ms to wait for an ack
@@ -38,6 +46,8 @@ boolean requestACK = false;
 SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
 
 RFM69 radio;
+
+DHT dht(DHTPIN, DHTTYPE);
 
 
 //########################################################################################################################
@@ -121,8 +131,8 @@ typedef struct
 	int weight;    // Weight
 	int supplyV;      // Supply voltage
 	byte outTemp; // Temperature of RF module outside hive. Probably not ver accurate as it's the RF chip temp.
-	int inTemp; // TH02 Temperature inside hive
-	int humidity; // TH02 humidity inside hive
+	float inTemp; // TH02 Temperature inside hive
+	float humidity; // TH02 humidity inside hive
 }
 Payload;
 
@@ -149,6 +159,8 @@ void setup()
 		Serial.println("SPI Flash Init OK!");
 	else
 		Serial.println("SPI Flash Init FAIL! (is chip present?)");
+		
+	dht.begin();
 
 	//#if DEBUG
 	// Set up stdout for printf
@@ -254,8 +266,8 @@ void loop()
 		theData.weight = weight;
 		theData.supplyV = readVccMv();
 		theData.outTemp = radio.readTemperature(TEMP_CALIBRATION);
-		theData.inTemp = 0; // TODO: Add TH02 code later
-		theData.humidity = 0; // TODO: Add TH02 code later
+		theData.inTemp = dht.readTemperature(); // TODO: Add TH02 code later
+		theData.humidity = dht.readHumidity(); // TODO: Add TH02 code later
 
 		Serial.print("Sending struct (");
 		Serial.print(sizeof(theData));

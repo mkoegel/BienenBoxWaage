@@ -5,7 +5,7 @@
 #define NODEID      1
 #define NETWORKID   100
 #define FREQUENCY   RF69_915MHZ //Match this with the version of your Moteino! (others: RF69_433MHZ, RF69_868MHZ)
-#define KEY         "thisIsEncryptKey" //has to be same 16 characters/bytes on all nodes, not more not less!
+#define KEY         "BienenBoxWaage00" //has to be same 16 characters/bytes on all nodes, not more not less!
 #define LED         9
 #define SERIAL_BAUD 115200
 #define ACK_TIME    30  // # of ms to wait for an ack
@@ -25,8 +25,8 @@ typedef struct
 	int weight;    // Weight
 	int supplyV;      // Supply voltage
 	byte outTemp; // Temperature of RF module outside hive. Probably not ver accurate as it's the RF chip temp.
-	int inTemp; // TH02 Temperature inside hive
-	int humidity; // TH02 humidity inside hive
+	float inTemp; // TH02 Temperature inside hive
+	float humidity; // TH02 humidity inside hive
 }
 Payload;
 
